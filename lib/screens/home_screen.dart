@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: GridView.builder(
               padding: const EdgeInsets.all(10.0),
               itemCount: filteredProducts.length,
-              itemBuilder: (ctx, i) => ProductItem(product: filteredProducts[i]),
+              itemBuilder: (ctx, i) => ProductItem(filteredProducts[i], product: filteredProducts[i],),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 3 / 4,

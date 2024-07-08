@@ -7,7 +7,7 @@ class CartItem {
 
   CartItem({
     required this.product,
-    this.quantity = 1,
+    this.quantity = 1, required id,
   });
 }
 
@@ -21,7 +21,7 @@ class Cart with ChangeNotifier {
     if (index >= 0) {
       _items[index].quantity += 1;
     } else {
-      _items.add(CartItem(product: product));
+      _items.add(CartItem(product: product, id: null));
     }
     notifyListeners();
   }

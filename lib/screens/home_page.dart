@@ -1,5 +1,8 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'dart:async';
+
+import '../models/cart.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -16,9 +19,13 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _timer = Timer.periodic(Duration(seconds: 10), (Timer timer) {
       if (_currentPage < 2) {
-        _currentPage++;
+        setState(() {
+          _currentPage++;
+        });
       } else {
-        _currentPage = 0;
+        setState(() {
+          _currentPage = 0;
+        });
       }
 
       _pageController.animateToPage(
@@ -38,17 +45,60 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final cart = Provider.of<Cart>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: AssetImage('assets/7.webp'), // Updated logo image
+              backgroundImage: AssetImage('assets/7.webp'),
             ),
             SizedBox(width: 10),
             Text('Plantify'),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/profile');
+            },
+          ),
+          Stack(
+            children: [
+              IconButton(
+                icon: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/cart');
+                },
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Container(
+                  padding: EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  constraints: BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    '${cart.items.length}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [
@@ -72,7 +122,7 @@ class _HomePageState extends State<HomePage> {
                   child: PageView(
                     controller: _pageController,
                     children: [
-                      Image.asset('assets/15.webp', fit: BoxFit.cover), // Add your sliding images in assets
+                      Image.asset('assets/15.webp', fit: BoxFit.cover),
                       Image.asset('assets/16.png', fit: BoxFit.cover),
                       Image.asset('assets/17.png', fit: BoxFit.cover),
                     ],
@@ -97,6 +147,30 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   GestureDetector(
                     onTap: () {
+                      Navigator.of(context).pushNamed('/indoor');
+                    },
+                    child: CategoryItem('Indoor', 'assets/9.webp'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/outdoor');
+                    },
+                    child: CategoryItem('Outdoor', 'assets/10.webp'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/offers');
+                    },
+                    child: CategoryItem('Offers', 'assets/11.webp'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/seasonal');
+                    },
+                    child: CategoryItem('Seasonal', 'assets/12.webp'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
                       Navigator.of(context).pushNamed('/home');
                     },
                     child: CategoryItem('Seeds', 'assets/6.webp'),
@@ -107,11 +181,7 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: CategoryItem('Tools', 'assets/8.webp'),
                   ),
-                  CategoryItem('Plant Care', 'assets/9.webp'),
-                  CategoryItem('Blog', 'assets/10.webp'),
-                  CategoryItem('Offers', 'assets/11.webp'),
-                  CategoryItem('Plants', 'assets/12.webp'),
-                  CategoryItem('Garden', 'assets/13.webp'),
+                  CategoryItem('FAQ s', 'assets/13.webp'),
                   CategoryItem('Others', 'assets/14.webp'),
                 ],
               ),
@@ -131,21 +201,23 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  GridView(
+                  GridView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.75, // Adjusted to fit content better
+                      childAspectRatio: 0.75,
                       mainAxisSpacing: 10,
                       crossAxisSpacing: 10,
                     ),
-                    children: [
-                      TrendingProductItem('assets/2.webp', 'Product 1'),
-                      TrendingProductItem('assets/3.webp', 'Product 2'),
-                      TrendingProductItem('assets/4.webp', 'Product 3'),
-                      TrendingProductItem('assets/5.webp', 'Product 4'),
-                    ],
+                    itemCount: trendingProducts.length,
+                    itemBuilder: (context, index) {
+                      return TrendingProductItem(
+                        trendingProducts[index]['imagePath'],
+                        trendingProducts[index]['productName'],
+                        trendingProducts[index]['price'],
+                      );
+                    },
                   ),
                 ],
               ),
@@ -181,35 +253,45 @@ class CategoryItem extends StatelessWidget {
 class TrendingProductItem extends StatelessWidget {
   final String imagePath;
   final String productName;
+  final double price;
 
-  TrendingProductItem(this.imagePath, this.productName);
+  TrendingProductItem(this.imagePath, this.productName, this.price);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey),
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(
-              imagePath,
-              width: 80, // Reduced size
-              height: 80, // Reduced size
-              fit: BoxFit.cover,
+            Expanded(
+              child: Image.asset(
+                imagePath,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
-            SizedBox(height: 10),
-            Text(productName),
             SizedBox(height: 5),
-            ElevatedButton(
-              onPressed: () {
-                // Add your add to cart functionality here
-              },
-              child: Text('Add to Cart'),
+            Text(
+              productName,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text('₹$price'),
+            SizedBox(height: 5),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  // Add your add to cart functionality here
+                },
+                child: Text('Add to Cart'),
+              ),
             ),
           ],
         ),
@@ -217,3 +299,26 @@ class TrendingProductItem extends StatelessWidget {
     );
   }
 }
+
+final List<Map<String, dynamic>> trendingProducts = [
+  {
+    'imagePath': 'assets/2.webp',
+    'productName': 'Product 1',
+    'price': 29.0,
+  },
+  {
+    'imagePath': 'assets/3.webp',
+    'productName': 'Product 2',
+    'price': 49.0,
+  },
+  {
+    'imagePath': 'assets/4.webp',
+    'productName': 'Product 3',
+    'price': 99.0,
+  },
+  {
+    'imagePath': 'assets/5.webp',
+    'productName': 'Product 4',
+    'price': 69.0,
+  },
+];

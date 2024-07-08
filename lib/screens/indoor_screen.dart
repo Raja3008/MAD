@@ -4,61 +4,36 @@ import '../models/product.dart';
 import '../widgets/product_item.dart';
 import '../models/cart.dart';
 
-class ToolsScreen extends StatefulWidget {
+class IndoorScreen extends StatefulWidget {
   @override
-  _ToolsScreenState createState() => _ToolsScreenState();
+  _IndoorScreenState createState() => _IndoorScreenState();
 }
 
-class _ToolsScreenState extends State<ToolsScreen> {
+class _IndoorScreenState extends State<IndoorScreen> {
   final List<Product> products = [
     Product(
-      id: 't1',
-      name: 'Tool 1',
+      id: 'p1',
+      name: 'Indoor Plant 1',
       price: 29,
       imageName: '1.webp',
     ),
     Product(
-      id: 't2',
-      name: 'Tool 2',
+      id: 'p2',
+      name: 'Indoor Plant 2',
       price: 49,
       imageName: '2.webp',
     ),
-    Product(
-      id: 't3',
-      name: 'Tool 3',
-      price: 99,
-      imageName: '3.webp',
-    ),
-    Product(
-      id: 't4',
-      name: 'Tool 4',
-      price: 69,
-      imageName: '4.webp',
-    ),
-    Product(
-      id: 't5',
-      name: 'Tool 5',
-      price: 49,
-      imageName: '5.webp',
-    ),
-    Product(
-      id: 't6',
-      name: 'Tool 6',
-      price: 59,
-      imageName: '1.webp',
-    ),
+    // Add more indoor products here
   ];
 
   final List<String> categories = [
-    'Seeds',
-    'Tools',
-    'Plants',
-    'Blog',
-    'Offers',
-    'Plant Care'
+    'Indoor',
+    'Outdoor',
+    'Seasonal',
+    'Offers'
   ];
 
-  String selectedCategory = 'Tools';
+  String selectedCategory = 'Indoor';
   String searchQuery = '';
 
   @override
@@ -66,12 +41,12 @@ class _ToolsScreenState extends State<ToolsScreen> {
     final filteredProducts = products.where((product) {
       final query = searchQuery.toLowerCase();
       return product.name.toLowerCase().contains(query) &&
-          (selectedCategory == 'Tools');
+          (selectedCategory == 'Indoor');
     }).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tools'),
+        title: Text('Indoor'),
         actions: [
           Consumer<Cart>(
             builder: (_, cart, ch) => Stack(
@@ -123,10 +98,14 @@ class _ToolsScreenState extends State<ToolsScreen> {
                   setState(() {
                     selectedCategory = categories[i];
                   });
-                  if (categories[i] == 'Seeds') {
-                    Navigator.of(context).pushNamed('/home');
-                  } else if (categories[i] == 'Tools') {
-                    Navigator.of(context).pushNamed('/tools');
+                  if (categories[i] == 'Outdoor') {
+                    Navigator.of(context).pushNamed('/outdoor');
+                  } else if (categories[i] == 'Seasonal') {
+                    Navigator.of(context).pushNamed('/seasonal');
+                  } else if (categories[i] == 'Offers') {
+                    Navigator.of(context).pushNamed('/Offers');
+                  } else if (categories[i] == 'Indoor') {
+                    Navigator.of(context).pushNamed('/indoor');
                   }
                 },
                 child: Container(
